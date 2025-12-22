@@ -1,5 +1,93 @@
 package model.dao.impl;
 
-public class SellerDaoJDBC {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+
+import model.dao.SellerDao;
+import model.entities.Department;
+import model.entities.Seller;
+
+public class SellerDaoJDBC implements SellerDao {
+
+	private Connection conn;
+	public SellerDaoJDBC(Connection conn) {
+		this.conn = conn;
+	}
+
+	@Override
+	public void insert(Seller dep) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(Seller dep) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteById(Integer id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Seller findById(Integer id) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		
+		try {
+			if (this.conn == null) {
+				throw new IllegalStateException("DAO connection is not initialized (conn == null)");
+			}
+			st = this.conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName\r\n"
+					+ "FROM seller INNER JOIN department\r\n"
+					+ "ON seller.DepartmentId = department.Id\r\n"
+					+ "WHERE seller.Id = ?");
+			
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			if (rs.next()) {
+				Department dep= new Department();
+				dep.setId(rs.getInt("DepartmentId"));
+				dep.setName(rs.getString("DepName"));
+				Seller seller = new Seller();
+				seller.setId(rs.getInt("Id"));
+				seller.setName(rs.getString("Name"));
+				seller.setEmail(rs.getString("Email"));
+				seller.setBaseSalary(rs.getDouble("BaseSalary"));
+				seller.setBirthDate(rs.getDate("BirthDate"));
+				seller.setDepartment(dep);
+				return seller;
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (st != null) {
+					st.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	public List<Seller> findAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
